@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 8000
 
 
-CMD ["sh", "-c", "gunicorn nombre_proyecto.wsgi --bind 0.0.0.0:$PORT"]
+CMD ["sh", "-c", "gunicorn stockify.wsgi --bind 0.0.0.0:$PORT"]
