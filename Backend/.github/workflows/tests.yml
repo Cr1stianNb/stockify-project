@@ -5,6 +5,7 @@ on:
     branches: [ "test-workflow" ]
   pull_request:
     branches: [ "test-workflow" ]
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,7 +16,7 @@ jobs:
         env:
           POSTGRES_DB: stockify_db
           POSTGRES_USER: user
-          POSTGRES_PASS: pass
+          POSTGRES_PASSWORD: pass
         ports: 
           - 5432:5432
         options: >-
@@ -23,25 +24,27 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-        steps:
-          - name: Checkout repo
-            uses: actions/checkout@v3
-          
-          - name: Set up Python
-            uses: actions/setup-python@v4
-            with:
-              python-version: "3.11"
-          - name: Install dependencies
-            run: |
-              python -m pip install --upgrade pip
-              pip install -r requeriments.txt
-          - name : Run migrations 
-            env: 
-              DATABASE_URL: postgres://user:pass@localhost:5432/stockify_db
-            run: python manage.py migrate
 
-          - name: Run Tests
-            env:
-              DATABASE_URL: postgres://user:pass@localhost:5432/stockify_db
-            run: python manage.py test
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requeriments.txt
+
+      - name: Run migrations 
+        env: 
+          DATABASE_URL: postgres://user:pass@postgres:5432/stockify_db
+        run: python manage.py migrate
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: postgres://user:pass@postgres:5432/stockify_db
+        run: python manage.py test
