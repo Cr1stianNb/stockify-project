@@ -146,27 +146,23 @@ const toast = useToast();
 
 const saveMovement = async (data) => {
     try {
-        await createMovement({
-            type: data.type,
-            amount: data.quantity,
-            product: data.product,
-        });
+        if (data.type === 'ENTRADA') {
+            await createMovementCompra({
+                id_user: data.id_user,
+                id_product: data.id_product,
+                unit_price: data.unit_price,
+                amount: data.quantity
+            });
+        } else if (data.type === 'SALIDA') {
+            await createMovementVenta({
+                id_user: data.id_user,
+                id_product: data.id_product,
+                unit_price: data.unit_price,
+                amount: data.quantity
+            });
+        }
         toast.add({ severity: 'success', summary: 'Movimiento creado', life: 3000 });
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error al crear movimiento', detail: error.message, life: 3000 });
     }
 };
-
-const updateMovement = async (data) => {
-    try {
-        await updateMovementService(data.id_movement, {
-            type: data.type,
-            amount: data.quantity,
-            product: data.product,
-        });
-        toast.add({ severity: 'success', summary: 'Movimiento actualizado', life: 3000 });
-    } catch (error) {
-        toast.add({ severity: 'error', summary: 'Error al actualizar movimiento', detail: error.message, life: 3000 });
-    }
-};
-</script>
