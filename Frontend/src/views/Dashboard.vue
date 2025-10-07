@@ -111,8 +111,8 @@
                             <!-- Left Column - Statistics -->
                             <div class="flex flex-col gap-4 flex-1">
                                 <div class="flex justify-between items-center py-1">
-                                    <span class="text-red-500 font-medium">Productos con bajo stock</span>
-                                    <span class="text-red-500 font-bold">{{ dashboardData.lowStockCount }}</span>
+                                    <span :class="dashboardData.lowStockCount > 0 ? 'text-red-500' : 'text-green-500'" class="font-medium">Productos con bajo stock</span>
+                                    <span :class="dashboardData.lowStockCount > 0 ? 'text-red-500' : 'text-green-500' " class="font-bold">{{ dashboardData.lowStockCount }}</span>
                                 </div>
                                 
                                 <div class="flex justify-between items-center py-1">
@@ -126,8 +126,8 @@
                                 </div>
                                 
                                 <div class="flex justify-between items-center py-1">
-                                    <span class="text-red-500 font-medium">Productos sin Movimiento</span>
-                                    <span class="text-red-500 font-bold">{{ dashboardData.noMovementCount }}</span>
+                                    <span :class="dashboardData.noMovementCount > 0 ? 'text-red-500' : 'text-green-500'" class="font-medium">Productos sin Movimiento</span>
+                                    <span :class="dashboardData.noMovementCount > 0 ? 'text-red-500' : 'text-green-500'" class="font-bold">{{ dashboardData.noMovementCount }}</span>
                                 </div>
                             </div>
                             
@@ -184,7 +184,7 @@
                 <GraficoLinea :earnings-data="dashboardData.earningsByDay" />
             </div>
             
-            <div class="flex flex-row gap-10 px-10 pb-10">
+            <div class="flex flex-row gap-10 pb-10">
                 <ProductReport />
                 <CategoryReport />
             </div>
@@ -215,7 +215,8 @@ import {
     getCategorySummary,
     getProductsWithoutMovement,
     getTopSoldProducts,
-    getEarningsByDay
+    getEarningsByDay,
+    getProfitByCategory
 } from '@/services/api/apiProductsStock';
 
 const loading = ref(true);
@@ -236,13 +237,11 @@ const dashboardData = ref({
     earningsByDay: []
 });
 
-// Función para formatear números
 const formatNumber = (value) => {
     if (!value && value !== 0) return '0';
     return new Intl.NumberFormat('es-CL').format(value);
 };
 
-// Función para obtener colores de productos
 const getProductColor = (index) => {
     const colors = [
         'bg-orange-500',
@@ -252,13 +251,18 @@ const getProductColor = (index) => {
     return colors[index] || 'bg-gray-500';
 };
 
-// Función principal para cargar todos los datos
 const fetchData = async () => {
     loading.value = true;
     error.value = null;
 
     try {
-        // Hacer todas las llamadas en paralelo
+        const data = await getProfitByCategory()
+        console.log(data)
+    } catch(e) {
+        console.log(e)
+    }
+
+    try {
         const [
             entriesRes,
             exitsRes,
@@ -285,7 +289,6 @@ const fetchData = async () => {
             getEarningsByDay()
         ]);
 
-        // Asignar los datos
         dashboardData.value = {
             totalEntries: entriesRes.data.total_entries || 0,
             totalExits: exitsRes.data.total_exits || 0,

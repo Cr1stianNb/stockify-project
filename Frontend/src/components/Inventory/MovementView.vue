@@ -114,7 +114,6 @@ import Tag from 'primevue/tag';
 import { useDialog } from '@/composables/useDialog';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
-import GraficoBarra from '../GraficoBarra.vue';
 const movimientos = ref([
   { id_movement: 1, type: 'ENTRADA', quantity: 50, product: 'Laptop', created_at: '2025-03-01' },
   { id_movement: 2, type: 'SALIDA', quantity: 10, product: 'Mouse', created_at: '2025-03-02' },

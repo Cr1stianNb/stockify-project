@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
-import { getProducts } from '../productService';
+import { getProduct, getProducts } from '../productService';
 import { getCategory } from '../categoryService';
+import { getMovements } from '../movementService';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL, 
@@ -53,7 +56,7 @@ export const getAmountProductsByCategory = async () => {
     const products = (await getProducts()).data;
     const productCountByCategory = new Map<number, number>();
     
-    products.forEach((product) => {
+    products.forEach((product: any) => {
       const currentCount = productCountByCategory.get(product.id_category) || 0;
       productCountByCategory.set(product.id_category, currentCount + 1);
     });
@@ -76,5 +79,77 @@ export const getAmountProductsByCategory = async () => {
     throw error;
   }
 }
+
+export const getProfitByCategory = async () => {
+  try {
+    const movements = (await getMovements()).data;
+    const profitByCategory = new Map(); 
+
+    for (const movement of movements) {
+      if (movement.type !== "venta") continue; 
+
+      for (const m of movement.id_movement) {
+        const product = (await getProduct(m.id_product)).data;
+        const profit = parseFloat(m.unit_price) * parseFloat(m.amount);
+
+        const currentProfit = profitByCategory.get(product.id_category) || 0;
+        profitByCategory.set(product.id_category, currentProfit + profit);
+      }
+    }
+    const result = await Promise.all(
+      Array.from(profitByCategory.entries()).map(async ([categoryId, profit]) => {
+        const category = (await getCategory(categoryId)).data;
+        return {
+          category: category.name,
+          ganancia: profit,
+        };
+      })
+    );
+
+    result.sort((a, b) => a.category.localeCompare(b.category));
+
+    return result;
+  } catch (error) {
+    console.error("Error al calcular beneficios por categoría:", error);
+    throw error;
+  }
+};
+
+
+export const getProfitByProduct = async () => {
+  try {
+    const movements = (await getMovements()).data
+    const profitByProduct = new Map()
+
+    for (const movement of movements) {
+      if (movement.type !== "venta") continue
+
+      for (const m of movement.id_movement) {
+        const productId = m.id_product
+        const profit = parseFloat(m.unit_price) * parseFloat(m.amount)
+
+        const currentProfit = profitByProduct.get(productId) || 0
+        profitByProduct.set(productId, currentProfit + profit)
+      }
+    }
+
+    const result = await Promise.all(
+      Array.from(profitByProduct.entries()).map(async ([productId, profit]) => {
+        const product = (await getProduct(productId)).data
+        return {
+          product: product.name,
+          ganancia: profit,
+        };
+      })
+    );
+
+    result.sort((a, b) => a.product.localeCompare(b.product))
+    return result
+  } catch (error) {
+    console.error("Error al calcular beneficios por producto:", error)
+    throw error
+  }
+};
+
 
 export default api;
