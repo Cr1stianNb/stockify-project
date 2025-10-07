@@ -104,6 +104,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { createMovement, updateMovement as updateMovementService } from '@/services/movementService';
 import Button from 'primevue/button';
 import Table from '../Table.vue';
 import Dialog from '../Dialog.vue';
@@ -144,12 +145,28 @@ const updateMovementDialog = useDialog({
 const toast = useToast();
 
 const saveMovement = async (data) => {
-  console.log('Guardando movimiento:', data);
-  // await api.post('/movimientos', data)
+    try {
+        await createMovement({
+            type: data.type,
+            amount: data.quantity,
+            product: data.product,
+        });
+        toast.add({ severity: 'success', summary: 'Movimiento creado', life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error al crear movimiento', detail: error.message, life: 3000 });
+    }
 };
 
 const updateMovement = async (data) => {
-  console.log('Actualizando movimiento:', data);
-  // await api.put('/movimientos', data)
+    try {
+        await updateMovementService(data.id_movement, {
+            type: data.type,
+            amount: data.quantity,
+            product: data.product,
+        });
+        toast.add({ severity: 'success', summary: 'Movimiento actualizado', life: 3000 });
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Error al actualizar movimiento', detail: error.message, life: 3000 });
+    }
 };
 </script>
