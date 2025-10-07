@@ -3,10 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime
-
 from django.db.models import Sum, F, FloatField
-
-
 from django.utils import timezone
 from .models import Category, Product, Movement, Record
 from .serializers import CategorySerializer, ProductSerializer, MovementSerializer, RecordSerializer
@@ -148,7 +145,7 @@ class MovementViewSet(viewsets.ModelViewSet):
     def compra(self, request):
 
         # Espera: id_user, id_product, unit_price, amount
-        id_user = request.data.get('id_user')
+        id_user = request.data.get('id_user',1)
         id_product = request.data.get('id_product')
         unit_price = request.data.get('unit_price')
         amount = request.data.get('amount')
