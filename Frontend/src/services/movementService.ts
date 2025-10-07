@@ -16,3 +16,4 @@ export const getMovement   = (id: number) => api.get(`/movements/${id}/`);
 export const createMovement = (data: any) => api.post('/movements/', data);
 export const updateMovement = (id: number, data: any) => api.put(`/movements/${id}/`, data);
 export const deletedMovement = (id: number) => api.delete(`/movements/${id}/`);
+
