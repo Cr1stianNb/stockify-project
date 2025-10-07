@@ -161,10 +161,8 @@ interface Product {
 }
 
 const products = ref<Product[]>([]);
-const loading = ref(false);
-const showDeleteConfirm = ref(false);
-const productToDelete = ref<Product | null>(null);
 
+const loading = ref(false);
 const toast = useToast();
 
 const columnas = [
@@ -226,33 +224,6 @@ const updateProduct = async (data: Product) => {
   // await updateProductAPI(data.id_product!, data);
   console.log('Actualizando:', data);
   await fetchProducts();
-};
-
-const confirmDelete = (product: Product) => {
-  productToDelete.value = product;
-  showDeleteConfirm.value = true;
-};
-
-const deleteProduct = async () => {
-  if (!productToDelete.value?.id_product) return;
-  
-  try {
-    await deleteProductAPI(productToDelete.value.id_product);
-    toast.add({
-      severity: 'success',
-      summary: 'Éxito',
-      detail: 'Producto eliminado correctamente',
-      life: 3000
-    });
-    await fetchProducts();
-  } catch (err) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Error al eliminar el producto',
-      life: 3000
-    });
-  }
 };
 
 onMounted(fetchProducts);
