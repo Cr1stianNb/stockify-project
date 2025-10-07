@@ -31,20 +31,20 @@
                             <Transition name="slide"
                             >
                                 <ul 
-                                    @click="selected = items.INVENTORY; changeView(items.INVENTORY)"
+                                    @click="selected = items.INVENTORY;"
                                     v-if="inventoryExpanded" 
-                                    class="list-none pl-2 m-0 overflow-hidden"
+                                    class="list-none m-0 overflow-hidden"
                                 >
-                                    <li><NavItem label="Producto" primeIcon="pi pi-box" /></li>
-                                    <li><NavItem label="Categorías" primeIcon="pi pi-tag" /></li>
-                                    <li><NavItem label="Movimientos" primeIcon="pi pi-arrow-right-arrow-left" /></li>
-                                    <li><NavItem label="Alertas" primeIcon="pi pi-exclamation-triangle" /></li>
+                                    <li class="pl-2" :class="selected == items.INVENTORY && subselected === InventorySubItems.PRODUCT ? 'bg-[#e8eef7] text-[#1e3a8a]' : '' " @click="changeView(items.INVENTORY, InventorySubItems.PRODUCT)"><NavItem label="Producto" primeIcon="pi pi-box" /></li>
+                                    <li class="pl-2" :class="selected == items.INVENTORY && subselected === InventorySubItems.CATEGORY ? 'bg-[#e8eef7] text-[#1e3a8a]' : '' " @click="changeView(items.INVENTORY, InventorySubItems.CATEGORY)"><NavItem label="Categorías" primeIcon="pi pi-tag" /></li>
+                                    <li class="pl-2" :class="selected == items.INVENTORY && subselected === InventorySubItems.MOVEMENT ? 'bg-[#e8eef7] text-[#1e3a8a]' : '' " @click="changeView(items.INVENTORY, InventorySubItems.MOVEMENT)"><NavItem label="Movimientos" primeIcon="pi pi-arrow-right-arrow-left" /></li>
                                 </ul>
                             </Transition>
                         </li>
                     </ul>
 
                     <!-- REPORTES -->
+                    <!--
                     <ul class="list-none m-0">
                         <li>
                             <div
@@ -60,16 +60,16 @@
                                 <ul 
                                     v-if="reportsExpanded" 
                                     class="list-none pl-2 m-0 overflow-hidden"
-                                    @click="selected = items.REPORTS; changeView(items.REPORTS)"
                                 >
-                                    <li><NavItem label="Ventas Por Producto" primeIcon="pi pi-chart-bar" /></li>
-                                    <li><NavItem label="Ventas Por Cliente" primeIcon="pi pi-users" /></li>
-                                    <li><NavItem label="Ventas por Categoría" primeIcon="pi pi-tags" /></li>
+                                    <li @click="changeView(items.REPORTS, ReportSubItem.PROFFIY_BY_PRODUCT)"><NavItem label="Ventas Por Producto" primeIcon="pi pi-chart-bar" /></li>
+                                    <li @click="changeView(items.REPORTS, ReportSubItem.PROFFIT_BY_CATEGORY)"><NavItem label="Ventas por Categoría" primeIcon="pi pi-tags" /></li>
                                     <li><NavItem label="Reporte Financiero" primeIcon="pi pi-dollar" /></li>
                                 </ul>
                             </Transition>
                         </li>
                     </ul>
+                    
+                    -->
                 
                 <div class="mt-auto">
                     <hr class="mb-4 mx-4 border-t border-0 border-surface-200 dark:border-surface-700" />
@@ -88,26 +88,26 @@
 import { ref } from 'vue';
 import 'primeicons/primeicons.css'
 import NavItem from "@/components/NavItem.vue";
-
-
+import { InventorySubItems } from '@/enums/InventorySubItem'
+import { EnumSidebarItem as items } from '@/enums/SidebarItem';
+import { ReportSubItem } from '@/enums/ReportSubItem';
 
 const inventoryExpanded = ref(true);
 const reportsExpanded = ref(false);
 
-const items = Object.freeze({
-  DASHBOARD: 'DASHBOARD',
-  INVENTORY: 'INVENTORY',
-  REPORTS: 'REPORTS',
-});
 
 const selected = ref(items.DASHBOARD)
+const subselected = ref('')
 
 const emit = defineEmits(['change-view'])
 
-const changeView = (view) => {
-    console.log(view)
+const changeView = (view, subView = null) => {
+    console.log(view, subView)
     selected.value = view
-    emit('change-view', view)
+    if(subView) {
+        subselected.value = subView
+    }
+    emit('change-view', { view, subView })
 }
 </script>
 

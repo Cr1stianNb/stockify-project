@@ -1,11 +1,12 @@
 <template>
     <div class="flex w-full h-dvh">
+        
         <div class="sticky top-0 h-dvh flex-shrink-0">
-            <Sidebar @change-view="selected = $event"/>
+            <Sidebar @change-view="handleViewChange"/>
         </div>
         <Dashboard v-if="selected == EnumSidebarItem.DASHBOARD" />
-        <Inventory v-if="selected == EnumSidebarItem.INVENTORY"/>
-        <Report v-if="selected == EnumSidebarItem.REPORTS" />
+        <Inventory v-if="selected == EnumSidebarItem.INVENTORY" :subView="subselected"/>
+        <Report v-if="selected == EnumSidebarItem.REPORTS" :subView="subselected" />
     </div>
 </template>
 
@@ -22,6 +23,16 @@ import { EnumSidebarItem } from '@/enums/SidebarItem';
 
 
 const selected = ref(EnumSidebarItem.DASHBOARD)
+const subselected = ref(null)
+
+const handleViewChange = (data) => {
+    console.log(data)
+    selected.value = data.view
+    if(data.subView) {
+        subselected.value = data.subView
+    }
+}
+
 
 </script>
 

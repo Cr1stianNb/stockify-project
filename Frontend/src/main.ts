@@ -5,6 +5,7 @@ import PrimeVue from 'primevue/config'
 import { Noir } from './presets/Noir'
 import  Ripple  from 'primevue/ripple';
 import StyleClass from 'primevue/styleclass'
+import ToastService from 'primevue/toastservice' 
 
 
 
@@ -17,6 +18,8 @@ app.use(PrimeVue, {
     },
     ripple: true
 } )
+
+app.use(ToastService) 
 
 app.directive('ripple', Ripple)
 app.directive('styleclass', StyleClass)

@@ -126,6 +126,8 @@
                 </template>
                 <template #content>
                     <div class="flex items-center justify-center h-full">
+                        <!-- acá debería de ser con la backend-->
+                        <!-- placeholder -->
                         <div class="grid grid-cols-3 gap-6">
                             <!-- Item 1 -->
                             <div class="flex flex-col items-center border-0 border-r-2 border-r-gray-200 pr-6">
@@ -161,6 +163,10 @@
         <div class="flex px-10 pb-10">
             <GraficoLinea />
         </div>
+        <div class="flex flex-row">
+            <ProductReport />
+            <CategoryReport />
+        </div>
     </div>
 </template>
 
@@ -171,11 +177,12 @@
 
 
 import 'primeicons/primeicons.css'
-import Sidebar from '@/components/Sidebar.vue';
 import Card from 'primevue/card'
 import Divider from 'primevue/divider'
 import GraficoLinea from '@/components/GraficoLinea.vue';
 import GraficoCircular from '@/components/GraficoCircular.vue';
+import ProductReport from '@/components/Reports/ProductReport.vue';
+import CategoryReport from '@/components/Reports/CategoryReport.vue';
 </script>
 
 
