@@ -8,7 +8,7 @@
             title="Crear Movimiento"
             width="600px"
             :loading="createMovementDialog.saving"
-            @save="createMovementDialog.save(saveMovement, toast)"
+            @save="createMovementDialog.save(saveMovement)"
             @cancel="createMovementDialog.cancel"
         >   
             <template #content>
@@ -30,10 +30,10 @@
                     <div class="flex flex-col gap-2">
                         <label class="font-semibold">Producto</label>
                         <Select 
-                            v-model="createMovementDialog.data.product"
-                            filter="true" 
-                            empty-filter-message="Producto no encontrado"
-                            :options="['Teclado', 'Mouse', 'Teléfono']"
+                            v-model="createMovementDialog.data.id_product"
+                            :options="products"
+                            optionLabel="name"
+                            optionValue="id_product"
                             placeholder="Selecciona un Producto"
                         />
                     </div>
@@ -46,7 +46,7 @@
             title="Actualizar Movimiento"
             width="600px"
             :loading="updateMovementDialog.saving"
-            @save="updateMovementDialog.save(updateMovement, toast)"
+            @save="updateMovementDialog.save(updateMovement)"
             @cancel="updateMovementDialog.cancel"
         >
             <template #content>
@@ -95,7 +95,7 @@
             <template #column-type="{ data }">
                 <Tag 
                     :value="data.type" 
-                    :severity="data.type === 'ENTRADA' ? 'success' : 'danger'" 
+                    :severity="data.type === 'VENTA' ? 'success' : 'danger'" 
                 />
             </template>
         </Table>
@@ -103,8 +103,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { createMovement, updateMovement as updateMovementService } from '@/services/movementService';
+import { onMounted, ref } from 'vue';
 import Button from 'primevue/button';
 import Table from '../Table.vue';
 import Dialog from '../Dialog.vue';
@@ -115,21 +114,24 @@ import Tag from 'primevue/tag';
 import { useDialog } from '@/composables/useDialog';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
-const movimientos = ref([
-  { id_movement: 1, type: 'ENTRADA', quantity: 50, product: 'Laptop', created_at: '2025-03-01' },
-  { id_movement: 2, type: 'SALIDA', quantity: 10, product: 'Mouse', created_at: '2025-03-02' },
-  { id_movement: 3, type: 'ENTRADA', quantity: 100, product: 'Teclado', created_at: '2025-03-03' }
-]);
+import { getProduct, getProducts } from '@/services/productService';
+import { createMovementCompra, createMovementVenta, getMovements } from '@/services/movementService';
+
+
+const movimientos = ref([]);
 
 const columnas = [
-  { field: 'id_movement', header: 'ID', style: { width: '80px' } },
+  { field: 'id_movement', header: 'ID' },
+  { field: 'id_product', header: 'Producto' },
+  { field: 'unit_price', header: 'Precio Unitario' },
+  { field: 'amount', header: 'Cantidad' },
   { field: 'type', header: 'Tipo', custom: true },
-  { field: 'quantity', header: 'Cantidad' },
-  { field: 'product', header: 'Producto' },
-  { field: 'created_at', header: 'Fecha' }
+  { field: 'date', header: 'Fecha' }
 ];
 
+
 const createMovementDialog = useDialog({ 
+    id_user: 1,
     type: 'ENTRADA',
     quantity: 0,
     product: ''
@@ -143,26 +145,69 @@ const updateMovementDialog = useDialog({
 });
 
 const toast = useToast();
+const products = ref([])
+
+const fetchData = async () => {
+    try {
+        const res = await getProducts();
+        products.value = res.data
+        console.log("PODUCTOS: ", products.value)
+    } catch(e) {
+        console.log(e)
+    }
+}
+
+const fetchMovements = async () => {
+    try {
+        const res = await getMovements();
+        // Transformamos la estructura anidada
+        movimientos.value = res.data.flatMap(item => 
+            item.id_movement.map(mov => ({
+                id_movement: mov.id_movement,
+                id_product: mov.id_product,
+                unit_price: parseFloat(mov.unit_price),
+                amount: mov.amount,
+                type: item.type.toUpperCase(), // para mantener coherencia con ENTRADA/SALIDA
+                date: item.date
+            }))
+        );
+        console.log("MOVIMIENTOS:", movimientos.value);
+    } catch (error) {
+        console.error("Error al obtener movimientos:", error);
+        toast.add({ severity: 'error', summary: 'Error al cargar movimientos', life: 3000 });
+    }
+};
+
 
 const saveMovement = async (data) => {
+    
     try {
+        const unit_price = (await getProduct(data.id_product)).data.unit_price
         if (data.type === 'ENTRADA') {
             await createMovementCompra({
                 id_user: data.id_user,
                 id_product: data.id_product,
-                unit_price: data.unit_price,
+                unit_price: unit_price,
                 amount: data.quantity
             });
         } else if (data.type === 'SALIDA') {
             await createMovementVenta({
                 id_user: data.id_user,
                 id_product: data.id_product,
-                unit_price: data.unit_price,
+                unit_price: unit_price,
                 amount: data.quantity
             });
         }
         toast.add({ severity: 'success', summary: 'Movimiento creado', life: 3000 });
+        await fetchMovements()
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error al crear movimiento', detail: error.message, life: 3000 });
     }
 };
+
+onMounted(() => {
+    fetchData()
+    fetchMovements()
+})
+
+</script>

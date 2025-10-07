@@ -50,6 +50,13 @@ export const getProfit = () => api.get('/products/profit/');
 // Profit Percentage
 export const getProfitPercentage = () => api.get('/products/profit_percentage/');
 
+export const getTotalStock = async () => {
+  const res = await getProductStocks();
+  const total = res.data.reduce((acc : any, obj : any) => acc + obj.stock, 0);
+  return total;
+};
+
+
 export const getAmountProductsByCategory = async () => {
   try {
 

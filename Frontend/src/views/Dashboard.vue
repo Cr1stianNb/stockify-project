@@ -48,7 +48,7 @@
                         </Card>
                         <Card class="w-[12rem] !shadow-md border border-gray-200">
                             <template #title>
-                                <div class="flex flex-row items-center justify-center gap-2 text-[#0eb874]">
+                                <div :class="formatNumber(dashboardData.profit) > 0 ? 'text-green-500' : 'text-red-500'" class="flex flex-row items-center justify-center gap-2">
                                     <p class="text-2xl">${{ formatNumber(dashboardData.profit) }}</p>
                                     <i class="pi pi-arrow-circle-up"></i>
                                 </div>
@@ -59,7 +59,7 @@
                         </Card>  
                         <Card class="w-[12rem] !shadow-md border border-gray-200">
                             <template #title>
-                                <div class="flex flex-row items-center justify-center gap-2 text-[#0eb874]">
+                                <div :class="dashboardData.profitPercentage > 0 ? 'text-green-500' : 'text-red-500'" class="flex flex-row items-center justify-center gap-2 ">
                                     <p class="text-2xl">{{ dashboardData.profitPercentage }}</p>
                                     <i class="pi pi-percentage"></i>
                                 </div>
@@ -152,15 +152,14 @@
                                 <div class="grid grid-cols-3 gap-6">
                                     <div 
                                         v-for="(product, index) in dashboardData.topProducts" 
-                                        :key="product.id"
+                                        :key="product.id_product__name"
                                         class="flex flex-col items-center"
                                         :class="{ 'border-0 border-r-2 border-r-gray-200 pr-6': index < 2 }"
                                     >
                                         <div 
                                             class="w-32 h-32 rounded-lg mb-3 flex items-center justify-center"
-                                            :class="getProductColor(index)"
                                         >
-                                            <i class="pi pi-image text-white text-2xl"></i>
+                                            <h1 class="font-semibold text-2xl text-gray-800">{{ product.id_product__name }}</h1>
                                         </div>
                                         <p class="text-sm text-gray-600 text-center mb-2">{{ product.name }}</p>
                                         <p class="text-3xl font-bold text-[#2A2A2A]">
@@ -216,8 +215,10 @@ import {
     getProductsWithoutMovement,
     getTopSoldProducts,
     getEarningsByDay,
+    getTotalStock,
     getProfitByCategory
 } from '@/services/api/apiProductsStock';
+import { Tag } from 'primevue';
 
 const loading = ref(true);
 const error = ref(null);
@@ -268,6 +269,7 @@ const fetchData = async () => {
             exitsRes,
             profitRes,
             profitPercentageRes,
+            totalStockRes,
             stockRes,
             stockValueRes,
             lowStockRes,
@@ -280,6 +282,7 @@ const fetchData = async () => {
             getTotalExits(),
             getProfit(),
             getProfitPercentage(),
+            getTotalStock(),
             getProductStocks(),
             getStockValue(),
             getLowStockProducts(),
@@ -294,7 +297,7 @@ const fetchData = async () => {
             totalExits: exitsRes.data.total_exits || 0,
             profit: profitRes.data.profit || 0,
             profitPercentage: profitPercentageRes.data.profit_percentage?.toFixed(2) || 0,
-            totalStock: stockRes.data.total_stock || 0,
+            totalStock: totalStockRes || 0,
             stockValue: stockValueRes.data.total_value || 0,
             lowStockCount: lowStockRes.data.count || 0,
             totalCategories: categoriesRes.data.total_categories || 0,
@@ -303,6 +306,8 @@ const fetchData = async () => {
             topProducts: topProductsRes.data.slice(0, 3) || [],
             earningsByDay: earningsRes.data || []
         };
+
+        console.log("TOP PRODUCTOS: ", dashboardData.topProducts)
 
     } catch (err) {
         console.error('Error fetching dashboard data:', err);

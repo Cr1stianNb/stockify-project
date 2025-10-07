@@ -5,7 +5,7 @@
       :labels="labels"
       :data="data"
       data-label="Ganancias ($)"
-      bar-color="#00B26B"
+      bar-color="#679DFF"
     />
   </div>
 </template>
