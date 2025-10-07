@@ -180,10 +180,16 @@ const fetchMovements = async () => {
 
 
 const saveMovement = async (data) => {
-    
     try {
-        const unit_price = (await getProduct(data.id_product)).data.unit_price
+        const productData = (await getProduct(data.id_product)).data;
+        const unit_price = productData.unit_price;
+        const stock = productData.stock;
+
         if (data.type === 'ENTRADA') {
+            if (data.quantity > 5000) {
+                toast.add({ severity: 'error', summary: 'Error', detail: 'No se puede realizar la compra: cantidad máxima permitida es 5000.', life: 3000 });
+                return;
+            }
             await createMovementCompra({
                 id_user: data.id_user,
                 id_product: data.id_product,
@@ -191,6 +197,10 @@ const saveMovement = async (data) => {
                 amount: data.quantity
             });
         } else if (data.type === 'SALIDA') {
+            if (data.quantity > stock) {
+                toast.add({ severity: 'error', summary: 'Error', detail: 'No hay más ejemplares disponibles para vender.', life: 3000 });
+                return;
+            }
             await createMovementVenta({
                 id_user: data.id_user,
                 id_product: data.id_product,
@@ -199,7 +209,7 @@ const saveMovement = async (data) => {
             });
         }
         toast.add({ severity: 'success', summary: 'Movimiento creado', life: 3000 });
-        await fetchMovements()
+        await fetchMovements();
     } catch (error) {
         toast.add({ severity: 'error', summary: 'Error al crear movimiento', detail: error.message, life: 3000 });
     }

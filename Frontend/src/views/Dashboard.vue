@@ -48,10 +48,13 @@
                         </Card>
                         <Card class="w-[12rem] !shadow-md border border-gray-200">
                             <template #title>
-                                <div :class="formatNumber(dashboardData.profit) > 0 ? 'text-green-500' : 'text-red-500'" class="flex flex-row items-center justify-center gap-2">
-                                    <p class="text-2xl">${{ formatNumber(dashboardData.profit) }}</p>
-                                    <i class="pi pi-arrow-circle-up"></i>
-                                </div>
+                            <div :class="[
+                                    'flex flex-row items-center justify-center gap-2',
+                                    dashboardData.profit > 0 ? 'text-green-500' : 'text-red-500'
+                                ]">
+                                <p class="text-2xl">${{ formatNumber(dashboardData.profit) }}</p>
+                                <i class="pi pi-arrow-circle-up"></i>
+                            </div>
                             </template>
                             <template #footer>
                                 <h1 class="text-center">Beneficios</h1>
@@ -109,7 +112,7 @@
                     <template #content>
                         <div class="flex flex-row gap-10">
                             <!-- Left Column - Statistics -->
-                            <div class="flex flex-col gap-4 flex-1">
+                            <div class="flex flex-col gap-4 flex-1 justify-evenly">
                                 <div class="flex justify-between items-center py-1">
                                     <span :class="dashboardData.lowStockCount > 0 ? 'text-red-500' : 'text-green-500'" class="font-medium">Productos con bajo stock</span>
                                     <span :class="dashboardData.lowStockCount > 0 ? 'text-red-500' : 'text-green-500' " class="font-bold">{{ dashboardData.lowStockCount }}</span>
@@ -120,10 +123,6 @@
                                     <span class="text-[#2A2A2A] font-bold">{{ dashboardData.totalCategories }}</span>
                                 </div>
                                 
-                                <div class="flex justify-between items-center py-3">
-                                    <span class="text-[#2A2A2A] font-medium">Total productos</span>
-                                    <span class="text-[#2A2A2A] font-bold">{{ dashboardData.totalProducts }}</span>
-                                </div>
                                 
                                 <div class="flex justify-between items-center py-1">
                                     <span :class="dashboardData.noMovementCount > 0 ? 'text-red-500' : 'text-green-500'" class="font-medium">Productos sin Movimiento</span>
@@ -218,7 +217,6 @@ import {
     getTotalStock,
     getProfitByCategory
 } from '@/services/api/apiProductsStock';
-import { Tag } from 'primevue';
 
 const loading = ref(true);
 const error = ref(null);
