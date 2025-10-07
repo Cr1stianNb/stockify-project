@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center justify-center px-10 pb-10 w-full h-full">
     <GraficoBarra 
-      title="Ganancias por Categoría"
+      title="Ganancias por Producto"
       :labels="labels"
       :data="data"
       data-label="Ganancias ($)"
