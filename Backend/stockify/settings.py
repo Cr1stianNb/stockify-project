@@ -70,7 +70,7 @@ DATABASES = {
     }
 }
 DATABASES['default']['TEST'] = {
-    'NAME': 'test_stockify_db',  # se creará y eliminará automáticamente
+    'NAME': 'test_stockify_db',  
 }
 
 AUTH_PASSWORD_VALIDATORS = [
