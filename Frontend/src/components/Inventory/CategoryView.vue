@@ -8,15 +8,28 @@
             title="Crear Categoría"
             width="600px"
             :loading="createCategoryDialog.saving"
-            @save="createCategoryDialog.save(saveCategory, toast)"
+            @save="createCategoryDialog.save(saveCategory)"
             @cancel="createCategoryDialog.cancel"
         >   
             <template #content>
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold">Nombre</label>
-                    <InputText v-model="createCategoryDialog.data.name" />
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold">Nombre</label>
+                        <InputText v-model="createCategoryDialog.data.name" />
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold">Descripción</label>
+                        <Textarea 
+                        v-model="createCategoryDialog.data.description" 
+                        rows="4"
+                        placeholder="Escribe una descripción..."
+                        />
+                    </div>
                 </div>
             </template>
+
+            
         </Dialog>
 
         <Dialog
@@ -24,20 +37,31 @@
             title="Actualizar Categoría"
             width="600px"
             :loading="updateCategoryDialog.saving"
-            @save="updateCategoryDialog.save(updateCategory, toast)"
+            @save="updateCategoryDialog.save(editCategory)"
             @cancel="updateCategoryDialog.cancel"
         >
             <template #content>
-                <div class="flex flex-col gap-2">
-                    <label class="font-semibold">Nombre</label>
-                    <InputText v-model="updateCategoryDialog.data.name" />
+                <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold">Nombre</label>
+                        <InputText v-model="updateCategoryDialog.data.name" />
+                    </div>
+
+                    <div class="flex flex-col gap-2">
+                        <label class="font-semibold">Descripción</label>
+                        <Textarea 
+                        v-model="updateCategoryDialog.data.description" 
+                        rows="4"
+                        placeholder="Escribe una descripción..."
+                        />
+                    </div>
                 </div>
             </template>
 
         </Dialog>
 
         <Table
-            :data="productos"
+            :data="categorias"
             :columns="columnas"
             title="Lista de Categorías"
             :actions="true"
@@ -48,23 +72,11 @@
                 </div>
             </template>
 
-            <template #column-precio="{ data }">
-            <span class="font-bold text-green-600">
-                ${{ data.precio.toLocaleString() }}
-            </span>
-            </template>
-
-            <template #column-stock="{ data }">
-            <span :class="data.stock < 10 ? 'text-red-600' : 'text-green-600'">
-                {{ data.stock }}
-            </span>
-            </template>
-
             <template #actions="{ data }">
             <Button 
                 icon="pi pi-pencil" 
                 class="p-button-rounded p-button-text"
-                @click="updateCategoryDialog.open({name: data.name})"
+                @click="updateCategoryDialog.open({ id_category: data.id_category, name: data.name, description: data.description})"
             />
             </template>
         </Table>
@@ -78,35 +90,64 @@ import Button from 'primevue/button'
 import Table from '../Table.vue'
 import Dialog from '../Dialog.vue'
 import InputText from 'primevue/inputtext'
+import { Textarea } from 'primevue';
 import { useDialog } from '@/composables/useDialog';
 import { useToast } from 'primevue/usetoast';
 import  Toast  from 'primevue/toast';
+import { getCategories, getCategory, createCategory, updateCategory } from '@/services/categoryService';
+import { onMounted } from 'vue';
+const categorias = ref([]);
+const loading = ref(false);
 
-const productos = ref([
-  { id: 1, name: 'Laptop', created_at: '2025-03-1' },
-  { id: 2, name: 'Mouse', created_at: '2025-03-1'},
-  { id: 3, name: 'Teclado', created_at: '2025-03-1'}
-]);
+const fetchCategories = async () => {
+  loading.value = true;
+  try {
+    const res = await getCategories();
+    categorias.value = res.data || [];
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar las categorías', life: 3000 });
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(fetchCategories);
+
 
 const columnas = [
-  { field: 'id', header: 'ID', style: { width: '80px' } },
+  { field: 'id_category', header: 'ID', style: { width: '80px' } },
   { field: 'name', header: 'Nombre' },
-  { field: 'created_at', header: 'Fecha Creación'}
+  { field: 'created_at', header: 'Fecha Creación'},
+  { field: 'description', header: 'Descripción'}
 ];
 
-const createCategoryDialog = useDialog({ name: ''})
-const updateCategoryDialog = useDialog({ name: ''})
+const createCategoryDialog = useDialog({ name: '', description: ''})
+const updateCategoryDialog = useDialog({ id_category: -1, name: '', description: ''})
 
 const toast = useToast() 
 
 const saveCategory = async (data) => {
-  console.log('Guardando:', data);
-  // await api.post('/categorias', data)
+    console.log(data)
+  try {
+    await createCategory(data);
+    toast.add({ severity: 'success', summary: 'Categoría creada', detail: 'Se ha agregado correctamente.', life: 3000 });
+    await fetchCategories();
+  } catch (err) {
+    toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear la categoría.', life: 3000 });
+  }
 };
 
-const updateCategory = (data) => {
-  console.log('Editar:', data);
-  // api put
+
+const editCategory = async (data) => {
+    console.log(data)
+    try {
+        await updateCategory(data.id_category, data);
+        toast.add({ severity: 'success', summary: 'Categoría actualizada', detail: 'Cambios guardados correctamente.', life: 3000 });
+        await fetchCategories();
+    } catch (err) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar la categoría.', life: 3000 });
+    }
 };
+
 
 </script>

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { getProducts } from '../productService';
+import { getCategory } from '../categoryService';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL, 
@@ -44,5 +46,35 @@ export const getProfit = () => api.get('/products/profit/');
 
 // Profit Percentage
 export const getProfitPercentage = () => api.get('/products/profit_percentage/');
+
+export const getAmountProductsByCategory = async () => {
+  try {
+
+    const products = (await getProducts()).data;
+    const productCountByCategory = new Map<number, number>();
+    
+    products.forEach((product) => {
+      const currentCount = productCountByCategory.get(product.id_category) || 0;
+      productCountByCategory.set(product.id_category, currentCount + 1);
+    });
+    
+    const result = await Promise.all(
+      Array.from(productCountByCategory.entries()).map(async ([categoryId, count]) => {
+        const category = (await getCategory(categoryId)).data;
+        return {
+          category: category.name,
+          products: count
+        };
+      })
+    );
+    
+    result.sort((a, b) => a.category.localeCompare(b.category));
+    return result;
+    
+  } catch (error) {
+    console.error('Error al obtener productos por categoría:', error);
+    throw error;
+  }
+}
 
 export default api;
