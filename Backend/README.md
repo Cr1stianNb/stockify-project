@@ -21,17 +21,31 @@
 
 # Formato para el endpoint de compra y endpoint de venta
 
--http://localhost:8000/movements/compra
+
+## Endpoints para crear movimientos
+
+### Compra
+POST http://localhost:8000/movements/compra/
+Body (JSON):
 {
   "id_user": 1,
   "id_product": 1,
   "unit_price": 12.50,
   "amount": 10
 }
--http://localhost:8000/movements/venta
+
+### Venta
+POST http://localhost:8000/movements/venta/
+Body (JSON):
 {
   "id_user": 1,
   "id_product": 1,
   "unit_price": 12.50,
   "amount": 10
 }
+
+En el frontend, usa:
+```typescript
+export const createMovementCompra = (data: any) => api.post('/movements/compra/', data);
+export const createMovementVenta = (data: any) => api.post('/movements/venta/', data);
+```
