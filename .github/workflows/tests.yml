@@ -48,7 +48,9 @@ jobs:
           POSTGRES_USER: user
           POSTGRES_PASSWORD: pass
 
-        run: python manage.py migrate
+        run: |
+          python manage.py makemigrations   
+          python manage.py migrate
 
       - name: Run Tests
         working-directory: Backend
