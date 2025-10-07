@@ -41,6 +41,17 @@
               currency="USD"
             />
           </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="font-semibold">Tipo</label>
+            <Select 
+              v-model="createProductDialog.data.id_category"
+              :options="categories"
+              optionLabel="name"
+              optionValue="id_category"
+              placeholder="Selecciona una categoría"
+            />
+          </div>
         </div>
       </template>
     </Dialog>
@@ -51,7 +62,7 @@
       title="Editar Producto"
       width="600px"
       :loading="updateProductDialog.saving"
-      @save="updateProductDialog.save(updateProduct, toast)"
+      @save="updateProductDialog.save(editProduct, toast)"
       @cancel="updateProductDialog.cancel"
     >
       <template #content>
@@ -76,7 +87,7 @@
           
           <div class="flex flex-col gap-2">
             <label class="font-semibold">Stock</label>
-            <InputNumber v-model="updateProductDialog.data.stock" />
+            <InputNumber disabled v-model="updateProductDialog.data.stock" />
           </div>
           
           <div class="flex flex-col gap-2">
@@ -148,6 +159,9 @@ import Textarea from 'primevue/textarea';
 import Toast from 'primevue/toast';
 import Table from '../Table.vue';
 import Dialog from '../Dialog.vue';
+import { getCategories } from '@/services/categoryService';
+import { updateProduct } from '@/services/productService';
+import Select  from 'primevue/select';
 
 
 interface Product {
@@ -160,7 +174,13 @@ interface Product {
   id_category?: number | null;
 }
 
+interface Category {
+  id_category : number 
+  name :  string
+}
+
 const products = ref<Product[]>([]);
+const categories = ref<Category[]>([])
 
 const loading = ref(false);
 const toast = useToast();
@@ -186,7 +206,6 @@ const updateProductDialog = useDialog({
   id_product: 0,
   name: '',
   description: '',
-  stock: 0,
   unit_price: 0
 });
 
@@ -195,7 +214,11 @@ const fetchProducts = async () => {
   loading.value = true;
   try {
     const res = await getProducts();
-    products.value = res.data;
+    const resCategory = await getCategories()
+
+    categories.value = resCategory.data
+    products.value = res.data
+
   } catch (err) {
     toast.add({
       severity: 'error',
@@ -213,15 +236,17 @@ const saveProduct = async (data: Product) => {
     name: data.name,
     description: data.description,
     stock: data.stock,
-    unit_price: data.unit_price
+    unit_price: data.unit_price,
+    id_category: data.id_category
   };
   
   await createProduct(payload);
   await fetchProducts();
 };
 
-const updateProduct = async (data: Product) => {
-  // await updateProductAPI(data.id_product!, data);
+const editProduct = async (data: Product) => {
+  console.log(data)
+  const res = await updateProduct(data.id_category as number, data)
   console.log('Actualizando:', data);
   await fetchProducts();
 };
