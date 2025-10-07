@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'stock.apps.StockConfig',
     'rest_framework',
 ]
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -35,7 +36,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:5174",
 ]
 
 ROOT_URLCONF = 'stockify.urls'
@@ -67,6 +68,9 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'db'),  # Usar 'db' para Docker
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
+}
+DATABASES['default']['TEST'] = {
+    'NAME': 'test_stockify_db',  
 }
 
 AUTH_PASSWORD_VALIDATORS = [
