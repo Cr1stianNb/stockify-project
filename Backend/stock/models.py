@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.conf import settings
 # Create your models here.
 class Category(models.Model):
     id_category = models.AutoField(primary_key=True)
@@ -26,7 +26,7 @@ class Product(models.Model):
 
 class Movement(models.Model):
     id_movement = models.AutoField(primary_key=True)
-    id_user = models.ForeignKey('users.User', on_delete=models.CASCADE)
+    id_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateField()
     type = models.TextField() # change later 
     records = models.ManyToManyField(Product, through='Record')
