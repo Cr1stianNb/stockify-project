@@ -53,7 +53,7 @@
                                     dashboardData.profit > 0 ? 'text-green-500' : 'text-red-500'
                                 ]">
                                 <p class="text-2xl">${{ formatNumber(dashboardData.profit) }}</p>
-                                <i class="pi pi-arrow-circle-up"></i>
+                                <i :class="dashboardData.profit > 0 ? 'pi pi-arrow-circle-up' : 'pi pi-arrow-circle-down'"></i>
                             </div>
                             </template>
                             <template #footer>
@@ -297,15 +297,15 @@ const fetchData = async () => {
             profitPercentage: profitPercentageRes.data.profit_percentage?.toFixed(2) || 0,
             totalStock: totalStockRes || 0,
             stockValue: stockValueRes.data.total_value || 0,
-            lowStockCount: lowStockRes.data.count || 0,
+            lowStockCount: lowStockRes.data.length || 0,
             totalCategories: categoriesRes.data.total_categories || 0,
             totalProducts: stockRes.data.total_products || 0,
-            noMovementCount: noMovementRes.data.count || 0,
+            noMovementCount: noMovementRes.data.length|| 0,
             topProducts: topProductsRes.data.slice(0, 3) || [],
             earningsByDay: earningsRes.data || []
         };
 
-        console.log("TOP PRODUCTOS: ", dashboardData.topProducts)
+        console.log("TOP PRODUCTOS: ", dashboardData.value.topProducts)
 
     } catch (err) {
         console.error('Error fetching dashboard data:', err);

@@ -30,7 +30,7 @@
           
           <div class="flex flex-col gap-2">
             <label class="font-semibold">Stock</label>
-            <InputNumber v-model="createProductDialog.data.stock" />
+            <InputNumber disabled v-model="createProductDialog.data.stock" />
           </div>
           
           <div class="flex flex-col gap-2">
